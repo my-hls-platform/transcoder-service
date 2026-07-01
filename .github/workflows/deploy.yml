@@ -31,7 +31,8 @@ jobs:
 
       - name: Package Lambda (Zip)
         run: |
-          cp -L node_modules/@ffmpeg-installer/linux-x64/ffmpeg dist/
+          FFMPEG_PATH=$(find node_modules -type f -path "*/@ffmpeg-installer/linux-x64/ffmpeg" | head -n 1)
+          cp -L "$FFMPEG_PATH" dist/ffmpeg
           cd dist
           chmod +x ffmpeg
           zip function.zip index.js ffmpeg
