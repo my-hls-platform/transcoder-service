@@ -1,0 +1,53 @@
+name: Deploy Transcoder to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build TypeScript
+        run: pnpm run build
+
+      - name: Prune Dev Dependencies
+        run: pnpm prune --prod
+
+      - name: Package Lambda (Zip)
+        run: |
+          cp -r node_modules dist/
+          cd dist
+          zip -r ../function.zip .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://function.zip
