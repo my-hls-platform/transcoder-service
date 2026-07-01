@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install
@@ -30,14 +29,13 @@ jobs:
       - name: Build TypeScript
         run: pnpm run build
 
-      - name: Prune Dev Dependencies
-        run: pnpm prune --prod
-
       - name: Package Lambda (Zip)
         run: |
-          cp -r node_modules dist/
+          cp -L node_modules/@ffmpeg-installer/linux-x64/ffmpeg dist/
           cd dist
-          zip -r ../function.zip .
+          chmod +x ffmpeg
+          zip function.zip index.js ffmpeg
+          mv function.zip ../
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

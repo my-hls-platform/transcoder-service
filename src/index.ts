@@ -1,6 +1,5 @@
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge'
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg'
 import { SQSEvent } from 'aws-lambda'
 import { error } from 'console'
 import ffmpeg from 'fluent-ffmpeg'
@@ -8,7 +7,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { pipeline } from 'stream/promises'
 
-ffmpeg.setFfmpegPath(ffmpegInstaller.path)
+ffmpeg.setFfmpegPath('/var/task/ffmpeg')
 
 const s3Client = new S3Client({})
 const eventBridgeClient = new EventBridgeClient()
